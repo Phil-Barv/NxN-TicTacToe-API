@@ -9,7 +9,12 @@ from game import TicTacToe
 
 @app.route('/', methods=["GET"])
 def index():
-    return jsonify({"state": a.board})
+    if a:
+        board = a.board
+    else:
+        board = TicTacToe(3).board
+        
+    return jsonify({"state": board})
 
 @app.route('/get-board', methods=["POST"])
 def get_board():
@@ -35,4 +40,5 @@ def ai_play():
     
     return jsonify({"play_state": res, "win": a.check_win(res)})
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
