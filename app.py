@@ -9,9 +9,10 @@ from game import TicTacToe
 @app.route('/', methods=["GET"])
 def index():
     try:
-        board = a.board
+        if a:
+            board = a.board
     except:
-        board = TicTacToe(3).board
+        board = TicTacToe(0).board
 
     return jsonify({"state": board})
 
