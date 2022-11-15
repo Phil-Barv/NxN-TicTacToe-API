@@ -25,14 +25,14 @@ class TicTacToe:
     def board(self):
         return self.board
 
-    def play_human(self, pos, move):
+    def play_human(self, state, pos, move):
         key = f"({pos[0]},{pos[1]})"
 
-        if key in self.board.keys():
-            self.board[key] = move
+        if key in state.keys():
+            state[key] = move
         
         # self.board["(1,1)"] = "O"
-        return self.board
+        return state
 
     def play_ai(self, state, val):
 

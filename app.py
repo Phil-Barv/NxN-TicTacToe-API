@@ -28,7 +28,7 @@ def get_board():
 @app.route('/human-play', methods=["POST"])
 def human_play():
     data = request.get_json()
-    res = a.play_human(data["pos"], data["value"])
+    res = a.play_human(data["state"], data["pos"], data["value"])
     print("\n\n\nHuman", res)
  
     return jsonify({"state": res, "win":a.check_win(res)})
