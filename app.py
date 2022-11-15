@@ -31,14 +31,14 @@ def human_play():
     res = a.play_human(data["pos"], data["value"])
     print("\n\n\n", res)
  
-    return jsonify({"play_state": res, "win":a.check_win(res)})
+    return jsonify({"state": res, "win":a.check_win(res)})
 
 @app.route('/ai-play', methods=["POST"])
 def ai_play():
     data = request.get_json()
     res = a.play_ai(data["state"], data["value"])
     
-    return jsonify({"play_state": res, "win": a.check_win(res)})
+    return jsonify({"state": res, "win": a.check_win(res)})
 
 if __name__ == "__main__":
     app.run(debug=True)
