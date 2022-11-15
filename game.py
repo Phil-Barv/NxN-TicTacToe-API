@@ -44,9 +44,9 @@ class TicTacToe:
 
         if len(temp) > 0:
             play = choice(temp)
-            self.board[play] = val
+            state[play] = val
 
-        return self.board
+        return state
 
     def check_win(self, state):
         lst = list(state.keys())

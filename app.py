@@ -29,7 +29,7 @@ def get_board():
 def human_play():
     data = request.get_json()
     res = a.play_human(data["pos"], data["value"])
-    print("\n\n\n", res)
+    print("\n\n\nHuman", res)
  
     return jsonify({"state": res, "win":a.check_win(res)})
 
@@ -37,6 +37,7 @@ def human_play():
 def ai_play():
     data = request.get_json()
     res = a.play_ai(data["state"], data["value"])
+    print("\n\n\nAI", res)
     
     return jsonify({"state": res, "win": a.check_win(res)})
 
