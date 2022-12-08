@@ -66,6 +66,6 @@ def ai_play():
 
 if __name__ == "__main__":
     print("Starting server...")
-    global a
-    a = TicTacToe(3, create_PD=True)
+    # global a
+    # a = TicTacToe(3, create_PD=True)
     app.run(debug=True)
