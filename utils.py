@@ -26,9 +26,9 @@ def memoization(function):
     return wrapper
 
 # @memoization
-def check_win(state):
+# def check_win(state):
     """
-        Function that checks the win status of a board.
+        Function that checks the win status of a board to update frontend.
         Input: 
             - state: the current board state.
         Output:
@@ -64,8 +64,8 @@ def check_win(state):
 
     #check right diagonal
     for i in range(n -1):
-        empty = state[f"({i},{n-i-1})"] == "—" or state[f"({i+1},{n-i-2})"] == "—"
-        diff = state[f"({i},{n-i-1})"] != state[f"({i+1},{n-i-2})"]
+        empty = (state[f"({i},{n-i-1})"] == "—" or state[f"({i+1},{n-i-2})"] == "—")
+        diff = (state[f"({i},{n-i-1})"] != state[f"({i+1},{n-i-2})"])
 
         if empty or diff:
             break
@@ -85,7 +85,125 @@ def check_win(state):
     else:
         return False
 
+def check_win(state):
+    """
+        Function that checks the win status of a board to update frontend.
+        Input: 
+            - state: the current board state.
+        Output:
+            - True/False/Draw: win status of the board.
+    """
+    #get board nxn size
+    n = int(sqrt(len(state)))
+    
+    #handle dict unpacking
+    if not isinstance(state, list):
+        temp = [[] for _ in range(n)]
+        count = 0
+        inx = 0
 
+        for value in state.values():
+            if count != 0 and count % n == 0:
+                inx += 1
+
+            temp[inx].append(value)
+            count += 1
+
+        state = temp
+
+    #generate board cols, main, other
+    cols = [ [row[i] for row in state] for i in range(n)]
+    main = [ state[i][i] for i in range(n)]
+    other =  [state[i][n-i-1] for i in range(n)]
+    
+    # print("\n\nSTATE", state, "\n\nCOLS", cols, "\n\nMAIN", main, "\n\nOTHER", other)
+
+    #rows and cols
+    for i in range(n):
+        for j in range(n):
+            #check col win
+            if cols[i].count(cols[i][j]) == n and cols[i][j] != "—":
+                #winner is X or O
+                return True
+
+            #check row win
+            if state[i].count(state[i][j]) == n and state[i][j] != "—":
+                #winner is X or O
+                return True
+
+        #main
+        if main.count(main[i]) == n and main[i] != "—":
+            #winner is X or O
+            return True
+
+        #other
+        if other.count(other[i]) == n and other[i] != "—":
+            #winner is X or O
+            return True
+
+    #check full board
+    for i in range(n):
+        for j in range(n):
+            #empy spot means continue game
+            if state[i][j] == '—':
+                return False
+
+    #draw
+    return 'Draw'
+
+def eval_function(state):
+    """
+        Function that evaluates a board in a non-terminal position
+        Input:
+            - state: current state of the board
+        Output:
+            - eval: a numeric value indicating utility
+    """
+    #initialize eval value
+    eval_x, eval_o = 0, 0 
+    
+    #get board nxn size
+    n = int(sqrt(len(state)))
+    
+    #handle dict unpacking
+    if not isinstance(state, list):
+        temp = [[] for _ in range(n)]
+        count = 0
+        inx = 0
+
+        for value in state.values():
+            if count != 0 and count % n == 0:
+                inx += 1
+
+            temp[inx].append(value)
+            count += 1
+
+        state = temp
+
+    #generate board cols, main, other
+    cols = [ [row[i] for row in state] for i in range(n)]
+    main = [ state[i][i] for i in range(n)]
+    other =  [state[i][n-i-1] for i in range(n)]
+    
+    # print(cols, main, other)
+    # print("\n\nSTATE", state, "\n\nCOLS", cols, "\n\nMAIN", main, "\n\nOTHER", other)
+
+    #rows and cols
+    for i in range(n):
+        # print("X", cols[i].count("X"), state[i].count("X"), eval_x)
+        # print("O", cols[i].count("O"), state[i].count("O"), eval_o)
+
+        #check cols, rows
+        eval_x += cols[i].count("X") + state[i].count("X") 
+        eval_o += cols[i].count("O") + state[i].count("O") 
+
+    #check main, other
+    eval_x += main.count("X") + other.count("X")
+    eval_o += main.count("O") + other.count("O")
+
+    return eval_x, eval_o, eval_x-eval_o
+
+    
 def medium_attack(state, alpha, beta, val):
     """
         Function that simulates AI attack using a faulty minimax alpha-beta prunning
@@ -173,11 +291,24 @@ def hard_attack(state, val):
     """
     current = -800
     move = 0
-
+    # d = {i:j for i in state.keys() for j in range(len(state))}
     for key in state.keys():
         if state[key] == "—":
             state[key] = val
+            # first = True if key == '(0,0)' else False
             score = minimax_abp(state, 0, -800, 800, False)
+            # d[key] = score
+            # print(f"STATE-ATTACK:")
+            # i = 0
+            # mod = sqrt(len(state))
+
+            # for item in state.items():
+            #     if i % mod == 0:
+            #         print("\n")
+            #     print(f"| {item[1]} ", end="")
+            #     i+= 1
+            # print("\n", score)
+
             state[key] = "—"
 
             if score > current:
@@ -185,6 +316,7 @@ def hard_attack(state, val):
                 move = key
 
     state[move] = val
+    # print(d)
 
     return state
 
@@ -201,6 +333,18 @@ def hard_defend(state, val):
         if state[key] == "—":
             state[key] = val
             score = minimax_abp(state, 0, -800, 800, True)
+
+            # print(f"STATE-DEFEND:")
+            # i = 0
+            # mod = sqrt(len(state))
+
+            # for item in state.items():
+            #     if i % mod == 0:
+            #         print("\n")
+            #     print(f"| {item[1]} ", end="")
+            #     i+= 1
+            # print("\n", score)
+
             state[key] = "—"
 
             if score < current:
@@ -230,13 +374,38 @@ def minimax_abp(state, depth, alpha, beta, attack):
     # print("\n")
 
     if winner == "X":
+
+        # n = int(sqrt(len(state)))
+        # found = False
+        # for i in range(n):
+        #     for j in range(n):
+        #         if state[f"({i},{j})"] == "—" and i != 1 and j != 1:
+        #             found = True
+        #         else:
+        #             found = False
+
+        # if found:
+        #     if state[f"({i},{j})"] == "X":
+        #         print('Win state:', state)
+        # if first:
+        #     print('Found a winner')
         return 10
 
     elif winner == "O":
         return -10
 
     elif winner == "—":
+        # if first:
+        #     print('Draw')
+        # print("Uwuw", state)
         return 0
+
+    # #optimization for non-terminal state
+    # if depth > 9:
+    #     return eval_function(state)
+
+    if (depth) >= 3:
+        return eval_function(state)
 
     if attack:
         mx = alpha
@@ -244,7 +413,7 @@ def minimax_abp(state, depth, alpha, beta, attack):
         for key in state.keys():
             if state[key] == "—":
                 state[key] = "X"
-                score = minimax_abp(state, depth + 1, alpha, beta, False)
+                score = minimax_abp(state, depth + 1, alpha, beta, False) - (depth + 1)
                 state[key] = "—"
 
                 mx = max(score, mx)
@@ -254,6 +423,8 @@ def minimax_abp(state, depth, alpha, beta, attack):
                     break
 
         # print("MAX", mx, "\n\n")
+        # if first:
+        #     print('Max is:', mx)
         return mx
 
     #minimize
@@ -263,7 +434,7 @@ def minimax_abp(state, depth, alpha, beta, attack):
         for key in state.keys():
             if state[key] == "—":
                 state[key] = "O"
-                score = minimax_abp(state, depth + 1, alpha, beta, True)
+                score = minimax_abp(state, depth + 1, alpha, beta, True) + (depth + 1)
                 state[key] = "—"
 
                 mn = min(score, mn)
@@ -273,19 +444,83 @@ def minimax_abp(state, depth, alpha, beta, attack):
                     break
 
         # print("MIN", mn, "\n\n")
+
         return mn
+
+
+# # Checks if the game has ended and returns the winner in each case
+# def _check_is_win(state):
+#     n = int(sqrt(len(state)))
+    
+#     if not isinstance(state, list):
+#         temp = [[] for _ in range(n)]
+#         count = 0
+#         inx = 0
+
+#         for key, value in state.items():
+#             if count != 0 and count % n == 0:
+#                 inx += 1
+
+#             temp[inx].append(value)
+#             count += 1
+
+#         state = temp
+
+#     # print("\nTEMP", temp)
+
+#     # Vertical win
+#     for i in range(n):
+#         if (state[0][i] != '—' and state[0][i] == state[1][i] and state[1][i] == state[2][i]):
+#             return state[0][i]
+
+#     # Horizontal win
+#     for i in range(n):
+#         if (state[i] == ['X', 'X', 'X']):
+#             return 'X'
+#         elif (state[i] == ['O', 'O', 'O']):
+#             return 'O'
+
+#     # Main diagonal win
+#     if (state[0][0] != '—' and
+#         state[0][0] == state[1][1] and
+#         state[0][0] == state[2][2]):
+#         return state[0][0]
+
+#     # Second diagonal win
+#     if (state[0][2] != '—' and state[0][2] == state[1][1] and state[0][2] == state[2][0]):
+#         return state[0][2]
+
+#     # Is whole board full?
+#     for i in range(n):
+#         for j in range(n):
+#             # There's an empty field, we continue the game
+#             if (state[i][j] == '—'):
+#                 return "Continue"
+
+#     # It's a tie!
+#     return '—'
+
 
 
 # Checks if the game has ended and returns the winner in each case
 def _check_is_win(state):
+    """
+        Internal use function that checks the win status of a board and return the winner.
+        Input: 
+            - state: the current board state.
+        Output:
+            - X/O/—/Continue: win status of the board.
+    """
+    #get board nxn size
     n = int(sqrt(len(state)))
     
+    #handle dict unpacking
     if not isinstance(state, list):
         temp = [[] for _ in range(n)]
         count = 0
         inx = 0
 
-        for key, value in state.items():
+        for value in state.values():
             if count != 0 and count % n == 0:
                 inx += 1
 
@@ -294,36 +529,43 @@ def _check_is_win(state):
 
         state = temp
 
-    # print("\nTEMP", temp)
+    #generate board cols, main, other
+    cols = [ [row[i] for row in state] for i in range(n)]
+    main = [ state[i][i] for i in range(n)]
+    other =  [state[i][n-i-1] for i in range(n)]
+    
+    # print("\n\nSTATE", state, "\n\nCOLS", cols, "\n\nMAIN", main, "\n\nOTHER", other)
 
-    # Vertical win
-    for i in range(n):
-        if (state[0][i] != '—' and state[0][i] == state[1][i] and state[1][i] == state[2][i]):
-            return state[0][i]
-
-    # Horizontal win
-    for i in range(n):
-        if (state[i] == ['X', 'X', 'X']):
-            return 'X'
-        elif (state[i] == ['O', 'O', 'O']):
-            return 'O'
-
-    # Main diagonal win
-    if (state[0][0] != '—' and
-        state[0][0] == state[1][1] and
-        state[0][0] == state[2][2]):
-        return state[0][0]
-
-    # Second diagonal win
-    if (state[0][2] != '—' and state[0][2] == state[1][1] and state[0][2] == state[2][0]):
-        return state[0][2]
-
-    # Is whole board full?
+    #rows and cols
     for i in range(n):
         for j in range(n):
-            # There's an empty field, we continue the game
-            if (state[i][j] == '—'):
+            #check col win
+            if cols[i].count(cols[i][j]) == n and cols[i][j] != "—":
+                #winner is X or O
+                return cols[i][j] 
+
+            #check row win
+            if state[i].count(state[i][j]) == n and state[i][j] != "—":
+                #winner is X or O
+                return state[i][j] 
+
+        #main
+        if main.count(main[i]) == n and main[i] != "—":
+            #winner is X or O
+            return main[i]
+
+        #other
+        if other.count(other[i]) == n and other[i] != "—":
+            #winner is X or O
+            return other[i]
+
+    #check full board
+    for i in range(n):
+        for j in range(n):
+            #empy spot
+            if state[i][j] == '—':
                 return "Continue"
 
-    # It's a tie!
+    #draw
     return '—'
+
