@@ -15,7 +15,7 @@ def index():
         if a:
             board = a.board
     except:
-        board = TicTacToe(0).board
+        board = TicTacToe(2).board
 
     return jsonify({"state": board})
 
