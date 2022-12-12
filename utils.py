@@ -404,8 +404,8 @@ def minimax_abp(state, depth, alpha, beta, attack):
     # if depth > 9:
     #     return eval_function(state)
 
-    if (depth) >= 3:
-        return eval_function(state)
+    # if (depth) >= 3:
+    #     return eval_function(state)
 
     if attack:
         mx = alpha
