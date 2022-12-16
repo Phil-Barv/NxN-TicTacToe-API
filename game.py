@@ -91,13 +91,6 @@ class TicTacToe:
         else:
             state = self.board
 
-        # #switch case opening move
-        # if "X" in state.values() or "O" in state.values():
-        #     pass
-        # else:
-        #     state['(1,1)'] = val
-        #     return state
-
         #switch case strategy
         if strategy == "Hard":
             return hard(state, val)
@@ -107,17 +100,6 @@ class TicTacToe:
 
         else:
             return easy(state, val)
-
-    # def get_board_val(self):
-    #     """
-    #         A function that returns the board best move given current board
-    #         Input:
-    #             -state: board state
-    #             -strategy: AI algorithm to use
-    #         Output:
-    #             -state: simulated board of next best move
-    #     """
-    #     return self.play_ai(state, val, strategy)
 
     def get_best_next(self, state, val, strategy):
         """
@@ -136,7 +118,7 @@ class TicTacToe:
             Input: 
                 -None
             Output:
-                -entries: a dictionary with all 181,440 permutations
+                -entries: a dictionary of permutations that gradually updates
         """
         # Generate start configuration
         start = {}
@@ -188,31 +170,6 @@ class TicTacToe:
             #DEBUG PRINTS -> Shows len, state, next state
             print(f"\n\nRound {len(entries)}:")
 
-            # if len(entries) == 1:
-            #     break
-
-            # print(f"Now State:")
-            # i = 0
-            # mod = sqrt(len(state))
-
-            # for item in state.items():
-            #     if i % mod == 0:
-            #         print("\n")
-            #     print(f"| {item[1]} ", end="")
-            #     i+= 1
-            # print("\n")
-
-            # print(f"Next State:")
-            # j = 0
-            # modj = sqrt(len(next_state))
-
-            # for itemj in next_state.items():
-            #     if j % modj == 0:
-            #         print("\n")
-            #     print(f"| {itemj[1]} ", end="")
-            #     j+= 1
-            # print("\n")
-
             #switch player
             attack = not attack
 
@@ -222,40 +179,10 @@ class TicTacToe:
             else:
                 player = "O"
 
-
-            # for key, val in next_state.items():
-            #     if val == "—":
-            #         #play move in possible moves
-            #         next_state[key] = player
-
             #generate children, i.e, simulate game
             temp1 = deepcopy(next_state)
             next_move = self.get_best_next(temp1, player, "Hard")
             queue.append([next_state, next_move])
-
-                    # #unplay move
-                    # next_state[key] = "—"
-
-            # #switch player
-            # attack = not attack
-
-            # for move in self.get_moves(state):
-            #     #generate next state by simulating movement
-            #     next_state = self.move_tile(state, move)
-            #     pos = state.index(0)
-                
-            #     #cost for swapping blank tile with number tile
-            #     if next_state[pos] > 0:
-            #         next_state_cost = [next_state, cost+1]
-            #     else:
-            #         next_state_cost = [next_state, cost]
-
-            #     if not "".join(str(t) for t in next_state) in visited:
-            #         queue.append(next_state_cost)
-                    
-            #     key = ("".join(str(t) for t in state)) 
-            #     entries[key] = (key, cost)
-            #     visited.add(key)
 
             # Print progress for every 10000 entries in visited.
             if len(entries) % 10000 == 0:

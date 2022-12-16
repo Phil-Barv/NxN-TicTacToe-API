@@ -7,8 +7,6 @@ cors = CORS(app)
 
 from game import TicTacToe
 
-import ast
-
 @app.route('/', methods=["GET"])
 def index():
     try:

@@ -25,66 +25,6 @@ def memoization(function):
 
     return wrapper
 
-# @memoization
-# def check_win(state):
-    """
-        Function that checks the win status of a board to update frontend.
-        Input: 
-            - state: the current board state.
-        Output:
-            - True/False/Draw: win status of the board.
-    """
-    lst = list(state.keys())
-    n = int(sqrt(len(lst)))
-
-    #check rows
-    for i in range(n):
-        for j in range(n-1):
-            if state[f"({i},{j})"] == "—" or state[f"({i},{j+1})"] == "—" or state[f"({i},{j})"] != state[f"({i},{j+1})"]:
-                break
-        else:
-            return True
-
-
-    #check columns
-    for j in range(n):
-        for i in range(n-1):
-            if state[f"({i},{j})"] == "—" or state[f"({i+1},{j})"] == "—" or state[f"({i},{j})"] != state[f"({i+1},{j})"]:
-                break
-        else:
-            return True
-
-
-    #check left diagonal
-    for i in range(n-1):
-        if state[f"({i},{i})"] == "—" or state[f"({i+1},{i+1})"] == "—" or state[f"({i},{i})"] != state[f"({i+1},{i+1})"]:
-            break
-    else:
-        return True
-
-    #check right diagonal
-    for i in range(n -1):
-        empty = (state[f"({i},{n-i-1})"] == "—" or state[f"({i+1},{n-i-2})"] == "—")
-        diff = (state[f"({i},{n-i-1})"] != state[f"({i+1},{n-i-2})"])
-
-        if empty or diff:
-            break
-
-    else:
-        return True
-
-
-    #draw 
-    if "—" not in list(state.values()):
-        return "Draw"
-
-    # #continue game
-    # elif "—" in list(state.values()):
-    #     return None
-    #no win 
-    else:
-        return False
-
 def check_win(state):
     """
         Function that checks the win status of a board to update frontend.
@@ -291,24 +231,11 @@ def hard_attack(state, val):
     """
     current = -800
     move = 0
-    # d = {i:j for i in state.keys() for j in range(len(state))}
+
     for key in state.keys():
         if state[key] == "—":
             state[key] = val
-            # first = True if key == '(0,0)' else False
             score = minimax_abp(state, 0, -800, 800, False)
-            # d[key] = score
-            # print(f"STATE-ATTACK:")
-            # i = 0
-            # mod = sqrt(len(state))
-
-            # for item in state.items():
-            #     if i % mod == 0:
-            #         print("\n")
-            #     print(f"| {item[1]} ", end="")
-            #     i+= 1
-            # print("\n", score)
-
             state[key] = "—"
 
             if score > current:
@@ -316,7 +243,6 @@ def hard_attack(state, val):
                 move = key
 
     state[move] = val
-    # print(d)
 
     return state
 
@@ -333,18 +259,6 @@ def hard_defend(state, val):
         if state[key] == "—":
             state[key] = val
             score = minimax_abp(state, 0, -800, 800, True)
-
-            # print(f"STATE-DEFEND:")
-            # i = 0
-            # mod = sqrt(len(state))
-
-            # for item in state.items():
-            #     if i % mod == 0:
-            #         print("\n")
-            #     print(f"| {item[1]} ", end="")
-            #     i+= 1
-            # print("\n", score)
-
             state[key] = "—"
 
             if score < current:
@@ -362,49 +276,17 @@ def minimax_abp(state, depth, alpha, beta, attack):
     """
     winner = _check_is_win(state)
 
-    # print(f"\n\nOUTCOME - Winner:{winner} | Depth:{depth} | State:")
-    # i = 0
-    # mod = sqrt(len(state))
-
-    # for item in state.items():
-    #     if i % mod == 0:
-    #         print("\n")
-    #     print(f"| {item[1]} ", end="")
-    #     i+= 1
-    # print("\n")
-
     if winner == "X":
-
-        # n = int(sqrt(len(state)))
-        # found = False
-        # for i in range(n):
-        #     for j in range(n):
-        #         if state[f"({i},{j})"] == "—" and i != 1 and j != 1:
-        #             found = True
-        #         else:
-        #             found = False
-
-        # if found:
-        #     if state[f"({i},{j})"] == "X":
-        #         print('Win state:', state)
-        # if first:
-        #     print('Found a winner')
         return 10
 
     elif winner == "O":
         return -10
 
     elif winner == "—":
-        # if first:
-        #     print('Draw')
-        # print("Uwuw", state)
         return 0
 
     # #optimization for non-terminal state
     # if depth > 9:
-    #     return eval_function(state)
-
-    # if (depth) >= 3:
     #     return eval_function(state)
 
     if attack:
@@ -423,8 +305,7 @@ def minimax_abp(state, depth, alpha, beta, attack):
                     break
 
         # print("MAX", mx, "\n\n")
-        # if first:
-        #     print('Max is:', mx)
+
         return mx
 
     #minimize
@@ -446,61 +327,6 @@ def minimax_abp(state, depth, alpha, beta, attack):
         # print("MIN", mn, "\n\n")
 
         return mn
-
-
-# # Checks if the game has ended and returns the winner in each case
-# def _check_is_win(state):
-#     n = int(sqrt(len(state)))
-    
-#     if not isinstance(state, list):
-#         temp = [[] for _ in range(n)]
-#         count = 0
-#         inx = 0
-
-#         for key, value in state.items():
-#             if count != 0 and count % n == 0:
-#                 inx += 1
-
-#             temp[inx].append(value)
-#             count += 1
-
-#         state = temp
-
-#     # print("\nTEMP", temp)
-
-#     # Vertical win
-#     for i in range(n):
-#         if (state[0][i] != '—' and state[0][i] == state[1][i] and state[1][i] == state[2][i]):
-#             return state[0][i]
-
-#     # Horizontal win
-#     for i in range(n):
-#         if (state[i] == ['X', 'X', 'X']):
-#             return 'X'
-#         elif (state[i] == ['O', 'O', 'O']):
-#             return 'O'
-
-#     # Main diagonal win
-#     if (state[0][0] != '—' and
-#         state[0][0] == state[1][1] and
-#         state[0][0] == state[2][2]):
-#         return state[0][0]
-
-#     # Second diagonal win
-#     if (state[0][2] != '—' and state[0][2] == state[1][1] and state[0][2] == state[2][0]):
-#         return state[0][2]
-
-#     # Is whole board full?
-#     for i in range(n):
-#         for j in range(n):
-#             # There's an empty field, we continue the game
-#             if (state[i][j] == '—'):
-#                 return "Continue"
-
-#     # It's a tie!
-#     return '—'
-
-
 
 # Checks if the game has ended and returns the winner in each case
 def _check_is_win(state):
